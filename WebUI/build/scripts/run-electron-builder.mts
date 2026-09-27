@@ -20,7 +20,17 @@ console.log(
 const result = spawnSync('electron-builder', process.argv.slice(2), {
   stdio: 'inherit',
   shell: process.platform === 'win32',
-  env: { ...process.env, INSTALLER_ID: identity.installerId },
+  env: {
+    ...process.env,
+    ...(process.platform === 'linux'
+      ? {
+          CXXFLAGS: [process.env.CXXFLAGS, '-Wno-error=comment', '-Wno-error=cast-function-type']
+            .filter(Boolean)
+            .join(' '),
+        }
+      : {}),
+    INSTALLER_ID: identity.installerId,
+  },
 })
 
 if (result.error) {
